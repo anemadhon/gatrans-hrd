@@ -244,4 +244,28 @@ class SubmitData extends CI_Model{
 			return 1;
 		}
 	}
+
+	public function saveTepe($data){
+		if ($data['training']=='' || $data['tmpttraining']=='' || $data['tglikut']=='' || $data['tglexp']=='') {
+			return 0;
+		} else {
+			$ip = array(
+				'idpeserta' => $data['idpeserta'],
+				'nama' => $data['nama'],
+				'nik' => $data['nik'],
+				'ktp' => $data['ktp'],
+				'training' => $data['training'],
+				'tmpttraining' => $data['tmpttraining'],
+				'tglikut' => date_format(date_create($data['tglikut']), "Y-m-d"),
+				'tglexp' => date_format(date_create($data['tglexp']), "Y-m-d"),
+				'ket' => $data['ket'],
+				'tgljaminput' => $data['tgljaminput'],
+				'userinput' => $data['userinput'],
+				'ippc' => $data['ippc']
+			);
+
+			$this->db->insert('hrdtp', $this->db->escape_str($ip));
+			return 1;
+		}
+	}
 }

@@ -41,19 +41,6 @@ $(document).ready(function(){
     })
 });
 
-// modal Training Program
-$(document).ready(function(){
-    let sub = document.URL.split('.');
-    let dir = sub[2].split('/');
-    if (dir[1]=='tp') {
-        $('#modal-content').html('COMING SOON');
-        $('.modal').modal('open');
-        $('.modal-close').on('click', function(){
-            window.location = 'http://hrd.gatrans.net/input';
-        });
-    }
-});
-
 // input data & update data
 $(document).ready(function () {
     $('#inputID').on('change', function () {
@@ -61,7 +48,7 @@ $(document).ready(function () {
         if (id) {
             $.ajax({
                 type:"post",
-                url: "http://hrd.gatrans.net/ajax-id",
+                url:"http://hrd.gatrans.net/ajax-id",
                 data:{'id':id},
                 success:function(data){
                     if (data > 0) {
@@ -454,3 +441,31 @@ $(document).ready(function(){
         }
     }  
 });
+
+/* $(document).ready(function(){
+    $.post("http://hrd.gatrans.net/ajax-tepe", (res) => {
+        const name = JSON.parse(res);
+        const data = {};
+        name.data.forEach(peserta => {
+            data[peserta.nama] = null;
+        });
+        $('input.autocomplete').autocomplete({data});
+    });
+
+    $('input.autocomplete').on('change', function(){
+        $.ajax({
+            type:"post",
+            url:"http://hrd.gatrans.net/ajax-tepe-auto-complete",
+            data:{nama:$(this).val()},
+            success:function(res){
+                const data = JSON.parse(res);
+                if (data) {
+                    $('#ktpPeserta').val(data.data.ktp)
+                    $('#nikPeserta').val(data.data.nik)
+                    $('#divPeserta').val(data.data.div)
+                    $('#jbtnPeserta').val(data.data.jbtn)
+                }
+            }
+        });
+    });
+}); */

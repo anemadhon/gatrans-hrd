@@ -796,5 +796,59 @@ class Input extends CI_Controller {
 	        	echo '<script>alert("Data Berhasil Diperbaharui");window.location.href="izin";</script>';
 	        }
 		}*/
+	}
+	
+	public function tepe_submit(){
+		/* $configtepe = array(
+				'upload_path' => './assets/img/attach/tepe',
+				'allowed_types' => 'doc|docx|pdf',
+				'max_size' => '51200'
+		);
+    	$this->load->library('upload',$configtepe);
+    	$this->upload->initialize($configtepe); 
+		if (! $this->upload->do_upload('file_tepe')) {
+			$error = array('error' => $this->upload->display_errors());
+			echo '<script>alert("File Eror :'.$error['error'].', Proses Upload Gagal.");window.location.href="tp";</script>';
+		}else{
+			$attach = $this->upload->data();
+			$arform = array(
+	   			'nolegal' => strtoupper($this->input->post('nolegal', TRUE)),
+	            'perihal' => strtoupper($this->input->post('perihal', TRUE)),
+	            'tglbuat' => $this->input->post('tglbuat', TRUE),
+	            'notaris' => strtoupper($this->input->post('notaris', TRUE)),
+	            'tmptbuat' => strtoupper($this->input->post('tmptbuat', TRUE)),
+	            'attach' => '/assets/img/attach/legal/akta/'.$attach['file_name'],
+	            'tgljaminput' => $this->input->post('tgljaminput', TRUE),
+	            'userinput' => strtoupper($this->input->post('userinput', TRUE)),
+	            'ippc' => $this->input->post('ippc', TRUE)
+	    	);
+			$status = $this->SubmitData->saveAkta($arform);
+	        if ($status==0) {
+	        	echo '<script>alert("File Eror, Gagal Menyimpan Data");window.location.href="tp";</script>';
+	        } else {
+	        	echo '<script>alert("Data Berhasil Disimpan");window.location.href="tp";</script>';
+	        }
+		} */
+
+		$arform = array(
+			'idpeserta' => strtoupper($this->input->post('idpeserta', TRUE)),
+			'nama' => strtoupper($this->input->post('namapeserta', TRUE)),
+			'nik' => strtoupper($this->input->post('nikpeserta', TRUE)),
+			'ktp' => strtoupper($this->input->post('ktppeserta', TRUE)),
+			'training' => strtoupper($this->input->post('training', TRUE)),
+			'tmpttraining' => strtoupper($this->input->post('tmpttraining', TRUE)),
+			'tglikut' => $this->input->post('tglikut', TRUE),
+			'tglexp' => $this->input->post('tglexp', TRUE),
+			'ket' => $this->input->post('ket', TRUE),
+			'tgljaminput' => $this->input->post('tgljaminput', TRUE),
+			'userinput' => strtoupper($this->input->post('userinput', TRUE)),
+			'ippc' => $this->input->post('ippc', TRUE)
+		);
+		$status = $this->SubmitData->saveTepe($arform);
+		if ($status==0) {
+			echo '<script>alert("Gagal Menyimpan Data, Semua Data Wajib diisi");window.location.href="tp";</script>';
+		} else {
+			echo '<script>alert("Data Berhasil Disimpan");window.location.href="tp";</script>';
+		}
     }
 }

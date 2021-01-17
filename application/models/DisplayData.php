@@ -481,18 +481,6 @@ class DisplayData extends CI_Model{
 		return $this->db->get();
 	}
 
-	public function tepeUp($a){
-
-		$this->db->select('hrddatadiri.iddiri as iddiri, hrddatapt.idpt as idpt, hrddatadiri.namadiri as nama, hrddatadiri.noktp as ktp, hrddatadiri.tlpon as tlp, hrddatapt.jbtn as jbtn, hrdtp.tipeskp as tipeskp, hrdtp.noskp as noskp, hrdtp.valid as valid, hrdtp.tmpt as tmpt, hrdtp.tgltp as tgltp, hrdtp.jenistp as jenistp');
-		$this->db->from('hrddatadiri');
-		$this->db->join('hrddatapt', 'hrddatadiri.noktp = hrddatapt.noktp AND hrddatadiri.pcip = hrddatapt.pcip');
-		$this->db->join('hrdtp', 'hrddatadiri.noktp = hrdtp.niktp AND hrddatadiri.pcip = hrdtp.ippc','left');
-		//$this->db->join('hrdtpattach', 'hrddatadiri.noktp = hrddatapt.noktp AND hrddatadiri.pcip = hrddatapt.pcip');
-		$this->db->where('hrddatadiri.noktp', $this->db->escape_like_str($a));
-
-		return $this->db->get()->row_array();
-	}
-
 	public function reminderLicense(){
 		$this->db->select('hrddatadiri.namadiri as nama, hrddatadiri.noktp as ktp, hrddatapt.nikpt as nik, hrddatapt.jbtn as jbtn, hrddatapt.masali as lisensi');
 		$this->db->from('hrddatadiri');
@@ -515,6 +503,92 @@ class DisplayData extends CI_Model{
 		$this->db->where('hrddatapt.statuspt <>','SK2');
 		$this->db->where('hrddatapt.statuspt <>','SK3');
 		$this->db->where('hrddatapt.statuspt <>','SK6');
+
+		return $this->db->get();
+	}
+
+	public function getNamaForTP(){
+
+		$this->db->select('hrddatadiri.namadiri as nama');
+		$this->db->from('hrddatadiri');
+		$this->db->join('hrddatapt', 'hrddatadiri.noktp = hrddatapt.noktp AND hrddatadiri.pcip = hrddatapt.pcip','inner');
+		$this->db->join('hrdattach', 'hrddatadiri.noktp = hrdattach.noktp AND hrddatadiri.pcip = hrdattach.pcip','inner');
+		$this->db->where('hrddatadiri.dlt',0);
+		$this->db->where(("hrddatapt.statuspt != 'SK2' AND hrddatapt.statuspt != 'SK3' AND hrddatapt.statuspt != 'SK6'"));
+		$this->db->order_by('hrddatadiri.iddiri ASC');
+
+		return $this->db->get()->result_array();
+	}
+	
+	public function getNamaForTPAutoComplete($nama){
+
+		$this->db->select('hrddatadiri.iddiri as id, hrddatadiri.namadiri as nama, hrddatadiri.noktp as ktp, hrddatapt.nikpt as nik, hrddatapt.divisi as div, hrddatapt.jbtn as jbtn');
+		$this->db->from('hrddatadiri');
+		$this->db->join('hrddatapt', 'hrddatadiri.noktp = hrddatapt.noktp AND hrddatadiri.pcip = hrddatapt.pcip','inner');
+		$this->db->join('hrdattach', 'hrddatadiri.noktp = hrdattach.noktp AND hrddatadiri.pcip = hrdattach.pcip','inner');
+		$this->db->where('hrddatadiri.dlt',0);
+		$this->db->where(("hrddatapt.statuspt != 'SK2' AND hrddatapt.statuspt != 'SK3' AND hrddatapt.statuspt != 'SK6'"));
+		$this->db->where('hrddatadiri.namadiri', $nama);
+
+		return $this->db->get()->row_array();
+	}
+
+	public function showDataTP($number = '', $offset = ''){
+		$this->db->from('hrdtp');
+		$this->db->join('hrddatapt', 'hrdtp.idpeserta = hrddatapt.idpt');
+		//$this->db->group_by('nama');
+		$this->db->order_by('idtp ASC');
+		if ($number && $offset) {
+			$this->db->limit($number,$offset);
+		}
+
+		return $this->db->get();
+	}
+	
+	public function showDataTPDetail(){
+		$this->db->from('hrdtp');
+		$this->db->join('hrddatapt', 'hrdtp.idpeserta = hrddatapt.idpt');
+		$this->db->order_by('idtp ASC');
+		$this->db->order_by('nama ASC');
+
+		return $this->db->get();
+	}
+
+	public function findTP($kw){
+
+		$this->db->from('hrdtp');
+		$this->db->join('hrddatapt', 'hrdtp.idpeserta = hrddatapt.idpt');
+		if ($kw['key_bln']) {
+			$this->db->where('month(tglikut)', $this->db->escape_like_str($kw['key_bln']));
+		}
+		if ($kw['key']) {
+			$this->db->like('nama', $this->db->escape_like_str($kw['key']));
+			$this->db->or_like('divisi', $this->db->escape_like_str($kw['key']));
+			$this->db->or_like('jbtn', $this->db->escape_like_str($kw['key']));
+			$this->db->or_like('training', $this->db->escape_like_str($kw['key']));
+			$this->db->or_like('tmpttraining', $this->db->escape_like_str($kw['key']));
+		}
+		$this->db->order_by('idtp ASC');
+		$this->db->order_by('nama ASC');
+
+		return $this->db->get();
+	}
+
+	public function cetak_tepe(){
+
+		$this->db->from('hrdtp');
+		$this->db->join('hrddatapt', 'hrdtp.idpeserta = hrddatapt.idpt');
+		$this->db->order_by('idtp ASC');
+		$this->db->order_by('nama ASC');
+
+		return $this->db->get();
+	}
+	
+	public function historyTepe($ktp){
+
+		$this->db->from('hrdtp');
+		$this->db->join('hrddatapt', 'hrdtp.idpeserta = hrddatapt.idpt');
+		$this->db->where('noktp', $ktp);
 
 		return $this->db->get();
 	}

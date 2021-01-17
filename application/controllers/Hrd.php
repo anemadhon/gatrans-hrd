@@ -181,36 +181,6 @@ class Hrd extends CI_Controller {
 			$this->load->view('login/loginHrd');
 		}
 	}
-
-	public function caritepe(){
-		if ($this->input->get('kw', TRUE)=='aktif') {
-			$kw = 'SK1';
-		} elseif ($this->input->get('kw', TRUE)=='skor') {
-			$kw = 'SK4';
-		} elseif ($this->input->get('kw', TRUE)=='cuti') {
-			$kw = 'SK5';
-		} elseif ($this->input->get('kw', TRUE)=='sma' || $this->input->get('kw', TRUE)=='smk') {
-			$kw = 'SMA/K';
-		} else {
-			$kw = $this->input->get('kw', TRUE);
-		}
-		$param = array(
-			'urut'=>$this->input->get('urut', TRUE),
-			'key'=>$kw
-		);
-		$data['param'] = $param;
-		if ($this->session->has_userdata('hasadmin')) {
-			$sesiLog = array(
-						'username' => $this->session->userdata('useradmin'),
-						'tepe' => $this->DisplayData->findData($param)
-						);
-			$dataLogMin['dataadmin'] = $sesiLog;
-			$this->load->view('header/headerMaster', $dataLogMin);
-			$this->load->view('body/tprogram', $dataLogMin);
-		} else {
-			$this->load->view('login/loginHrd');
-		}
-	}
 	
 	public function updatedata($ktp){
 		if ($this->session->has_userdata('hasadmin')) {
@@ -459,20 +429,6 @@ class Hrd extends CI_Controller {
 		}
 	}
 
-	public function tepe_up($a){
-		if ($this->session->has_userdata('hasadmin')) {
-			$sesiLog = array(
-						'username' => $this->session->userdata('useradmin'),
-						'tepe_up' => $this->DisplayData->tepeUp($a)
-						);
-			$dataLogMin['dataadmin'] = $sesiLog;
-			$this->load->view('header/headerMaster', $dataLogMin);
-			$this->load->view('body/tepe_up', $dataLogMin);
-		} else {
-			$this->load->view('login/loginHrd');
-		}
-	}
-
 	public function hbd(){
 		if ($this->session->has_userdata('hasadmin')) {
 			$sesiLog = array(
@@ -557,5 +513,60 @@ class Hrd extends CI_Controller {
 	public function logout(){
 		$this->session->sess_destroy();
 		redirect('login');
+	}
+
+	public function ajax_tepe(){
+		$nama = $this->DisplayData->getNamaForTP();
+		
+        $json_data = [
+            'data' => $nama 
+		];
+		
+        echo json_encode($json_data);
+	}
+
+	public function ajax_tepe_auto_complete(){
+		$nama = $this->input->post('nama',TRUE);
+		$data = $this->DisplayData->getNamaForTPAutoComplete($nama);
+		
+		$json_data = [
+            'data' => $data 
+		];
+		
+        echo json_encode($json_data);
+	}
+
+	public function tepe(){
+		if ($this->session->has_userdata('hasadmin')) {
+			$sesiLog = array(
+						'username' => $this->session->userdata('useradmin')
+						);
+			$dataLogMin['dataadmin'] = $sesiLog;
+			$this->load->view('header/headerMaster', $dataLogMin);
+			$this->load->view('body/tprogram_input', $dataLogMin);
+		} else {
+			$this->load->view('login/loginHrd');
+		}
+	}
+
+	public function caritepe(){
+		$kw = $this->input->get('kw', TRUE);
+		$kwBln = $this->input->get('bulan', TRUE);
+		$param = array(
+			'key_bln'=>$kwBln,
+			'key'=>$kw
+		);
+		$data['param'] = $param;
+		if ($this->session->has_userdata('hasadmin')) {
+			$sesiLog = array(
+						'username' => $this->session->userdata('useradmin'),
+						'tepe' => $this->DisplayData->findTP($param)
+						);
+			$dataLogMin['dataadmin'] = $sesiLog;
+			$this->load->view('header/headerMaster', $dataLogMin);
+			$this->load->view('body/tprogram_display', $dataLogMin);
+		} else {
+			$this->load->view('login/loginHrd');
+		}
 	}
 }

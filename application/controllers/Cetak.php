@@ -9,6 +9,7 @@ class Cetak extends CI_Controller {
 		$this->load->library('Pdf_akta');
 		$this->load->library('Pdf_pks');
 		$this->load->library('Pdf_izin');
+		$this->load->library('Pdf_tepe');
 		$this->load->model('DisplayData');
 		$this->load->model('ImportGaji');
 		$this->load->model('ImportLembur');
@@ -246,7 +247,7 @@ class Cetak extends CI_Controller {
 					$pdf->Ln(0.5);
 					$pdf->Cell(0, 0.5, '', 0, 1, 'C', true);
 					$pdf->Ln(5);
-					$pdf->Image($urlfoto, 10, 23, 75, 95); //51, 76
+					//$pdf->Image($urlfoto, 10, 23, 75, 95); //51, 76
 					$pdf->SetFont('Arial', 'B', 14);
 					$pdf->Cell(80);
 					$pdf->Cell(33, 6, 'NAMA', 0, 0, 'L', false);
@@ -381,8 +382,29 @@ class Cetak extends CI_Controller {
 					$pdf->MultiCell($w, $h, $cv['alamat'], 0, 'L');
 					$pdf->SetXY($x + $w, $y);
 					$pdf->Ln(35);
+					$his = $this->DisplayData->historyTepe($cv['ktp']);
+					if ($his->num_rows()>0) {
+						$pdf->SetFont('Arial', 'B', 15);
+						$pdf->Cell(0, 0.5, '', 0, 1, 'C', true);
+						$pdf->Cell(0, 8, 'HISTORY TRAINING', 0, 1, 'L', false);
+						$pdf->Cell(0, 0.5, '', 0, 1, 'C', true);
+						$pdf->Ln(1);
+						$pdf->SetFont('Arial', '', 9);
+						$pdf->Cell(50, 5, 'NAMA TRAINING', 0, 1, 'L', false);
+						foreach ($his->result() as $hispt) {
+							$tglakhir = date_format(date_create($hispt->tglexp), "d-m-Y");
+							$tglawal = date_format(date_create($hispt->tglikut), "d-m-Y");
+							$pdf->Cell(2, 5, '-', 0, 0, 'L', false);
+							$pdf->Cell(50, 5, $hispt->training, 0, 1, 'L', false);
+							$pdf->Cell(3, 5, '', 0, 0, 'L', false);
+							$pdf->Cell(50, 5, 'Tgl Ikut: '.$tglawal, 0, 1, 'L', false);
+							$pdf->Cell(3, 5, '', 0, 0, 'L', false);
+							$pdf->Cell(50, 5, 'Tgl Berakhir: '.$tglakhir, 0, 1, 'L', false);
+						}
+					}
 				}
-				$pdf->Output('CV_ALL.pdf', 'I');
+				$namafile = 'CV '.$cv['nama'].'.pdf';
+				$pdf->Output($namafile, 'I');
 			}
 		} else {
 			$this->load->view('login/loginHrd');
@@ -468,7 +490,7 @@ class Cetak extends CI_Controller {
 			$pdf->Ln(0.5);
 			$pdf->Cell(0, 0.5, '', 0, 1, 'C', true);
 			$pdf->Ln(5);
-			$pdf->Image($urlfoto, 10, 23, 75, 95); //51, 76
+			//$pdf->Image($urlfoto, 10, 23, 75, 95); //51, 76
 			$pdf->SetFont('Arial', 'B', 14);
 			$pdf->Cell(80);
 			$pdf->Cell(33, 6, 'NAMA', 0, 0, 'L', false);
@@ -603,25 +625,26 @@ class Cetak extends CI_Controller {
 			$pdf->MultiCell($w, $h, $cv->alamat, 0, 'L');
 			$pdf->SetXY($x + $w, $y);
 			$pdf->Ln(35);
-			/*$pdf->SetFont('Arial', 'B', 15);
-			$pdf->Cell(0, 0.5, '', 0, 1, 'C', true);
-			$pdf->Cell(0, 8, 'REKAM JEJAK KARYAWAN', 0, 1, 'L', false);
-			$pdf->Cell(0, 0.5, '', 0, 1, 'C', true);
-			$pdf->Ln(1);
-			$pdf->SetFont('Arial', '', 10);
-			$pdf->Cell(0, 5, 'PERUSAHAAN', 0, 1, 'L', false);
-			$pdf->Ln(1);
-			$pdf->SetFont('Arial', '', 9);
-			$his = $this->DisplayData->hispt($cv['ktp']);
-			if ($his->num_rows()>1) {
+			$his = $this->DisplayData->historyTepe($cv->ktp);
+			if ($his->num_rows()>0) {
+				$pdf->SetFont('Arial', 'B', 15);
+				$pdf->Cell(0, 0.5, '', 0, 1, 'C', true);
+				$pdf->Cell(0, 8, 'HISTORY TRAINING', 0, 1, 'L', false);
+				$pdf->Cell(0, 0.5, '', 0, 1, 'C', true);
+				$pdf->Ln(1);
+				$pdf->SetFont('Arial', '', 9);
+				$pdf->Cell(50, 5, 'NAMA TRAINING', 0, 1, 'L', false);
 				foreach ($his->result() as $hispt) {
-					$tglakhir = date_format(date_create($hispt->tglupdate), "d-m-Y");
-					$tglawal = date_format(date_create($hispt->tglonhis), "d-m-Y");
+					$tglakhir = date_format(date_create($hispt->tglexp), "d-m-Y");
+					$tglawal = date_format(date_create($hispt->tglikut), "d-m-Y");
 					$pdf->Cell(2, 5, '-', 0, 0, 'L', false);
-					$pdf->Cell(50, 5, $hispt->jbtnhis, 0, 0, 'L', false);
-					$pdf->Cell(20, 5, $tglakhir, 0, 1, 'L', false);
+					$pdf->Cell(50, 5, $hispt->training, 0, 1, 'L', false);
+					$pdf->Cell(3, 5, '', 0, 0, 'L', false);
+					$pdf->Cell(50, 5, 'Tgl Ikut: '.$tglawal, 0, 1, 'L', false);
+					$pdf->Cell(3, 5, '', 0, 0, 'L', false);
+					$pdf->Cell(50, 5, 'Tgl Berakhir: '.$tglakhir, 0, 1, 'L', false);
 				}
-			}*/
+			}
 		}
 		$pdf->Output('CV_ALL.pdf', 'I');
 	}
@@ -1245,6 +1268,86 @@ class Cetak extends CI_Controller {
 			force_download('assets/img/attach/legal/'.$path[0].'/'.$path[1], NULL);
 		} else {
 			force_download('assets/img/attach/'.$path[0].'/'.$path[1], NULL);
+		}
+	}
+
+	public function pdf_tepe() {
+		if ($this->session->has_userdata('hasadmin')) {
+			$sesiLog = array(
+				'username' => $this->session->userdata('useradmin')
+			);
+			$user = $sesiLog['username'];
+			$hasil = $this->DisplayData->cetak_tepe();
+			$pdf = $this->pdf_tepe->getPdfTepe();
+			$pdf->AliasNbPages('{pages}');
+			$pdf->AddPage('L', 'A4', 0);
+			$pdf->SetFont('Arial', '', 8);
+			$pdf->SetTextColor(0, 0, 0);
+			$pdf->SetFillColor(0, 0, 0);
+			$pdf->SetDrawColor(0, 0, 0);
+			$no = 1;
+			foreach ($hasil->result() as $cetak) {
+				$w = 44;
+				$h = 5;
+				if ($pdf->GetStringWidth($cetak->tmpttraining) < $w) {
+					$lined = 1;
+				} else {
+					$eror = 10;
+					$maxchar = 0;
+					$holdtxt = "";
+					$ptxtd = strlen($cetak->tmpttraining);
+					$chard = 0;
+					$txtarrayd = array();
+					while ($chard < $ptxtd) {
+						while ($pdf->GetStringWidth($holdtxt) < ($w - $eror) && ($chard + $maxchar) < $ptxtd) {
+							$maxchar++;
+							$holdtxt = substr($cetak->tmpttraining, $chard, $maxchar);
+						}
+						$chard = $chard + $maxchar;
+						array_push($txtarrayd, $holdtxt);
+						$maxchar = 0;
+						$holdtxt = "";
+					}
+					$lined = count($txtarrayd);
+				}
+				$pdf->SetAutoPageBreak(true, 10);
+				$pdf->Cell(7, ($lined * $h), $no, 'LB', 0, 'C');
+				$pdf->Cell(44, ($lined * $h), $cetak->nama, 'LB', 0, 'L', false);
+				$pdf->Cell(15, ($lined * $h), $cetak->nik, 'LB', 0, 'C', false);
+				$pdf->Cell(50, ($lined * $h), $cetak->jbtn, 'LB', 0, 'L', false);
+				$pdf->Cell(85, ($lined * $h), $cetak->training, 'LB', 0, 'L', false);
+				$x = $pdf->GetX();
+				$y = $pdf->GetY();
+				$pdf->MultiCell($w, $h, $cetak->tmpttraining, 'LB', 'L');
+				$pdf->SetXY($x + $w, $y);
+				$pdf->Cell(16, ($lined * $h), date_format(date_create($cetak->tglikut), "d-m-Y"), 'LB', 0, 'C', false);
+				$pdf->Cell(16, ($lined * $h), date_format(date_create($cetak->tglexp), "d-m-Y"), 'LBR', 1, 'C', false);
+				$no++;
+			}
+			$pdf->Ln(5);
+			$pdf->Cell(30);
+			$pdf->Cell(20, 5, 'Dibuat Oleh', 0, 1, 'C', false);
+			$pdf->Ln(25);
+			$pdf->Cell(30);
+			$pdf->Cell(20, 5, $this->session->userdata('useradmin'), 0, 1, 'C', false);
+			$pdf->Cell(30);
+			$pdf->Cell(20, 5, 'Staff HRD', 0, 1, 'C', false);
+			$pdf->Output('Data Training Program.pdf', 'I');
+		} else {
+			$this->load->view('login/loginHrd');
+		}
+	}
+
+	public function excel_tepe() {
+		if ($this->session->has_userdata('hasadmin')) {
+			$sesiLog = array(
+				'username' => $this->session->userdata('useradmin'),
+				'excel' => $this->DisplayData->cetak_tepe()
+			);
+			$dataLogMin['dataadmin'] = $sesiLog;
+			$this->load->view('excel/excel_tepe', $dataLogMin);
+		} else {
+			$this->load->view('login/loginHrd');
 		}
 	}
 }
