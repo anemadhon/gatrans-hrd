@@ -30,6 +30,7 @@ header("Content-Disposition: attachment; filename=Data_Karyawan.xls");
                 <th>TTL</th>
                 <th>Tanggal Aktif</th>
                 <th>Lama Bekerja</th>
+                <th>Tgl Kadaluarsa Id Card</th>
             </tr>
         </thead>
     	<tbody>
@@ -37,8 +38,8 @@ header("Content-Disposition: attachment; filename=Data_Karyawan.xls");
     		$no=1;
             if ($this->input->post('excel', TRUE)=='') {
                 foreach ($dataadmin['excel']->result() as $excel) {
-                    $tglon = new DateTime($excel->on);
                     $today = new DateTime();
+                    $tglon = new DateTime($excel->on);
                     $lb = $today->diff($tglon);
                     if ($lb->y==0 && $lb->m==0) {
                         $lamakerja = $lb->d.' Hari';
@@ -54,6 +55,24 @@ header("Content-Disposition: attachment; filename=Data_Karyawan.xls");
                         $lamakerja = $lb->y.' Tahun '.$lb->m.' Bulan ';
                     } else {
                         $lamakerja = $lb->y.' Tahun '.$lb->m.' Bulan '.$lb->d.' Hari';
+                    }
+
+                    $tglExp = new DateTime($excel->expidcard);
+                    $lbId = $today->diff($tglExp);
+                    if ($lbId->y==0 && $lbId->m==0) {
+                        $countId = $lbId->format('%r%d Hari');
+                    } elseif ($lbId->y==0 && $lbId->d==0) {
+                        $countId = $lbId->format('%r%m Bulan');
+                    } elseif ($lbId->m==0 && $lbId->d==0) {
+                        $countId = $lbId->format('%r%y Tahun');
+                    } elseif ($lbId->y==0) {
+                        $countId = $lbId->format('%r%m Bulan ').$lbId->format('%r%d Hari');
+                    } elseif ($lbId->m==0) {
+                        $countId = $lbId->format('%r%y Tahun ').$lbId->format('%r%d Hari');
+                    } elseif ($lbId->d==0) {
+                        $countId = $lbId->format('%r%y Tahun ').$lbId->format('%r%m Bulan');
+                    } else {
+                        $countId = $lbId->format('%r%y Tahun ').$lbId->format('%r%m Bulan ').$lbId->format('%r%d Hari');
                     }
             ?>
                     <tr>
@@ -68,6 +87,17 @@ header("Content-Disposition: attachment; filename=Data_Karyawan.xls");
                         <td><?php echo $excel->t.', '.$excel->tl ?></td>
                         <td><?php echo $excel->on; ?></td>
                         <td><?php echo $lamakerja; ?></td>
+                        <?php 
+                        if ($excel->expidcard != '0000-00-00') {
+                        ?>
+                            <td><?php echo $excel->expidcard.' ('.$countId.')'; ?></td>
+                        <?php
+                        } else {
+                        ?>
+                            <td><?php echo ''; ?></td>
+                        <?php
+                        }
+                        ?>
                     </tr>
             <?php 
                     $no++;
@@ -76,8 +106,8 @@ header("Content-Disposition: attachment; filename=Data_Karyawan.xls");
                 $val = explode('/', $this->input->post('excel', TRUE));
                 $excel_arr = array();
                 for ($i=0; $i < count($val)-1; $i++) { 
-                    $tglon = new DateTime($dataadmin['excel'][$i]['on']);
                     $today = new DateTime();
+                    $tglon = new DateTime($dataadmin['excel'][$i]['on']);
                     $lb = $today->diff($tglon);
                     if ($lb->y==0 && $lb->m==0) {
                         $lamakerja = $lb->d.' Hari';
@@ -94,6 +124,24 @@ header("Content-Disposition: attachment; filename=Data_Karyawan.xls");
                     } else {
                         $lamakerja = $lb->y.' Tahun '.$lb->m.' Bulan '.$lb->d.' Hari';
                     }
+
+                    $tglExp = new DateTime($dataadmin['excel'][$i]['expidcard']);
+                    $lbId = $today->diff($tglExp);
+                    if ($lbId->y==0 && $lbId->m==0) {
+                        $countId = $lbId->format('%r%d Hari');
+                    } elseif ($lbId->y==0 && $lbId->d==0) {
+                        $countId = $lbId->format('%r%m Bulan');
+                    } elseif ($lbId->m==0 && $lbId->d==0) {
+                        $countId = $lbId->format('%r%y Tahun');
+                    } elseif ($lbId->y==0) {
+                        $countId = $lbId->format('%r%m Bulan ').$lbId->format('%r%d Hari');
+                    } elseif ($lbId->m==0) {
+                        $countId = $lbId->format('%r%y Tahun ').$lbId->format('%r%d Hari');
+                    } elseif ($lbId->d==0) {
+                        $countId = $lbId->format('%r%y Tahun ').$lbId->format('%r%m Bulan');
+                    } else {
+                        $countId = $lbId->format('%r%y Tahun ').$lbId->format('%r%m Bulan ').$lbId->format('%r%d Hari');
+                    }
             ?>
                     <tr>
                         <td><?php echo $i+1; ?></td>
@@ -107,6 +155,17 @@ header("Content-Disposition: attachment; filename=Data_Karyawan.xls");
                         <td><?php echo $dataadmin['excel'][$i]['t'].', '.$dataadmin['excel'][$i]['tl']; ?></td>
                         <td><?php echo $dataadmin['excel'][$i]['on']; ?></td>
                         <td><?php echo $lamakerja; ?></td>
+                        <?php 
+                        if ($dataadmin['excel'][$i]['expidcard'] != '0000-00-00') {
+                        ?>
+                            <td><?php echo $dataadmin['excel'][$i]['expidcard'].' ('.$countId.')'; ?></td>
+                        <?php
+                        } else {
+                        ?>
+                            <td><?php echo ''; ?></td>
+                        <?php
+                        }
+                        ?>
                     </tr>
             <?php
                 }

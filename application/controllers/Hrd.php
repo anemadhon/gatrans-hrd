@@ -314,12 +314,15 @@ class Hrd extends CI_Controller {
     			$count = $lb->format('%r%y Tahun ').$lb->format('%r%m Bulan');
     		} else {
     			$count = $lb->format('%r%y Tahun ').$lb->format('%r%m Bulan ').$lb->format('%r%d Hari');
-    		}
-    		$hariminus = (int)$lb->format('%r%d');
-			$bulanminus = (int)$lb->format('%r%m');
-    		//if ($count=='2 Bulan' || $count=='1 Bulan' || ($lb->y==0 && $lb->m < 2) && ($hariminus > 0 || $bulanminus > 0)) {
+			}
+			$countIntSeparatorLisensi = explode(', ', $count);
+			$countIntBulanLisensi = explode(' ', $countIntSeparatorLisensi[0]);
+			if ((int)$countIntBulanLisensi[0] <= 4 && $countIntBulanLisensi[1] == 'Bulan' || ($countIntBulanLisensi[1] == 'Hari' || (int)$countIntBulanLisensi[0] < 0)) {
+				/* $hariminus = (int)$lb->format('%r%d');
+				$bulanminus = (int)$lb->format('%r%m');
+    			if ($count=='2 Bulan' || $count=='1 Bulan' || ($lb->y==0 && $lb->m < 2) && ($hariminus > 0 || $bulanminus > 0)) { */
     			$prm[]=$lisensi;
-    		//}
+    		}
     	}
     	$prmId = array();
 		$reminderId = $this->DisplayData->reminderIdCard();
@@ -342,10 +345,14 @@ class Hrd extends CI_Controller {
     			$countId = $lbId->format('%r%y Tahun ').$lbId->format('%r%m Bulan');
     		} else {
     			$countId = $lbId->format('%r%y Tahun ').$lbId->format('%r%m Bulan ').$lbId->format('%r%d Hari');
-    		}
-    		$hariminusId = (int)$lbId->format('%r%d');
-			$bulanminusId = (int)$lbId->format('%r%m');
-    		if ($countId=='14 Hari' || (($lbId->y==0 && $lbId->m < 2) && ($hariminusId > 0 || $bulanminusId > 0))) {
+			}
+			$countIntHari = explode(' ', $countId);
+			$countIntSeparator = explode(', ', $countId);
+			$countIntBulan = explode(' ', $countIntSeparator[0]);
+			if ((int)$countIntHari[0] <= 14 && $countIntHari[1] == 'Hari' || (count($countIntSeparator) > 1 && (int)$countIntBulan[0] < 0)) {
+				/* $hariminusId = (int)$lbId->format('%r%d');
+				$bulanminusId = (int)$lbId->format('%r%m');
+				if ($countId=='14 Hari' || (($lbId->y==0 && $lbId->m < 2) && ($hariminusId > 0 || $bulanminusId > 0))) { */
     			$prmId[]=$exp;
     		}
     	}

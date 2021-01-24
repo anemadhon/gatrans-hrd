@@ -123,7 +123,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 	    		$today = new DateTime();
 	    		$lb = $today->diff($tglLisensi);
 	    		if ($lb->y==0 && $lb->m==0) {
-	    			$countExp = $lb->format('%r%d Hari');
+	    			$count = $lb->format('%r%d Hari');
 	    		} elseif ($lb->y==0 && $lb->d==0) {
 	    			$count = $lb->format('%r%m Bulan');
 	    		} elseif ($lb->m==0 && $lb->d==0) {
